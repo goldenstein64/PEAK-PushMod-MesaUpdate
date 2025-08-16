@@ -91,7 +91,7 @@ public class PushManager : MonoBehaviour {
             }
 
             coolDownLeft = 1f;
-            float staminaUsed = 0.1f * forceMultiplier;
+            float staminaUsed = 0.1f;
             localCharacter.UseStamina(staminaUsed, true);
 
             Plugin.Log.LogInfo("Sending Push RPC Event");
