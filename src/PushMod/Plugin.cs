@@ -60,7 +60,7 @@ public class PushManager : MonoBehaviour {
 
         Item currentItem = localCharacter.data.currentItem;
         if (currentItem != null) {
-            bingBong = currentItem.GetItemName().Contains("Bing Bong");
+            bingBong = currentItem.GetItemName().ToLowerInvariant().Contains("bing bong");
             if (!bingBong) return;
         }
         else bingBong = false;
@@ -116,7 +116,7 @@ public class PushManager : MonoBehaviour {
         CharacterAnimations characterAnimations = character.gameObject.GetComponent<CharacterAnimations>();
         Animator animator = characterAnimations.character.refs.animator;
 
-        animator.Play("A_Scout_Reach_Straight");
+        animator.Play("A_Scout_Reach_Air");
     }
 
     [PunRPC]

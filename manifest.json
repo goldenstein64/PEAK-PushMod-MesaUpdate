@@ -1,0 +1,9 @@
+{
+    "name": "PushMod-MesaUpdate",
+    "version_number": "0.5.1",
+    "website_url": "https://github.com/Cyber-Corvid/PEAK-PushMod-MesaUpdate",
+    "description": "Push your friends around! (Updated for the Mesa!)",
+    "dependencies": [
+        "BepInEx-BepInExPack_PEAK"
+    ]
+}

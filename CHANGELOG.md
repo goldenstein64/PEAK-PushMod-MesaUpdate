@@ -1,5 +1,10 @@
 # Changelog
 
+## Version 0.5.1
+- Forked from original project
+- Updated mod to support the Mesa update
+- Bing Bong Push no longer uses up all stamina (because it's funny this way)
+
 ## Version 0.5.0
 - Added Bing Bong Force Multiplier
    - Holding Bing Bong while pushing will push with 10x Force
