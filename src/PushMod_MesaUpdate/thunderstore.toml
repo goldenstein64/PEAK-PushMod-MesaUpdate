@@ -6,7 +6,7 @@ repository = "https://thunderstore.io"
 
 [package]
 namespace = "goldenstein64"
-name = "PushMod-MesaUpdate"
+name = "PushMod_MesaUpdate"
 description = "Push your friends with the F key!"
 websiteUrl = "https://github.com/goldenstein64/PEAK-PushMod-MesaUpdate"
 containsNsfwContent = false
