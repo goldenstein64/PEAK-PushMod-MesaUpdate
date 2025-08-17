@@ -5,10 +5,10 @@ schemaVersion = "0.0.1"
 repository = "https://thunderstore.io"
 
 [package]
-namespace = "boxofbiscuits97"
-name = "PushMod"
+namespace = "goldenstein64"
+name = "PushMod-MesaUpdate"
 description = "Push your friends with the F key!"
-websiteUrl = "https://github.com/Boxofbiscuits97/PEAK-PushMod"
+websiteUrl = "https://github.com/goldenstein64/PEAK-PushMod-MesaUpdate"
 containsNsfwContent = false
 
 [package.dependencies]

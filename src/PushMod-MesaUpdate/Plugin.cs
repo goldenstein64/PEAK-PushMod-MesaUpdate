@@ -1,5 +1,6 @@
 ﻿using BepInEx;
 using BepInEx.Logging;
+using BepInEx.Configuration;
 using HarmonyLib;
 using Photon.Pun;
 using UnityEngine;
@@ -11,12 +12,14 @@ namespace PushMod;
 public partial class Plugin : BaseUnityPlugin
 {
     internal static ManualLogSource Log { get; private set; } = null!;
+    internal static ConfigEntry<KeyCode>? keyboardKeybindConfig;
 
     private void Awake()
     {
         Log = Logger;
 
         Log.LogInfo($"Plugin {Name} is loaded!");
+        keyboardKeybindConfig = Config.Bind("Settings", "Keyboard Keybind", KeyCode.F, "Keyboard Key used to push. Defaults to F.");
         Harmony.CreateAndPatchAll(typeof(PushPatch));
     }
 }
@@ -66,7 +69,7 @@ public class PushManager : MonoBehaviour {
         }
         else bingBong = false;
 
-        if (Input.GetKeyDown(KeyCode.F)) {
+        if (Input.GetKeyDown(Plugin.keyboardKeybindConfig!.Value)) {
             Character pushedCharacter;
 
             RaycastHit HitInfo;
