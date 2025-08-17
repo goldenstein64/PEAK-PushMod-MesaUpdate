@@ -32,40 +32,41 @@ public static class PushPatch {
 }
 
 public class PushManager : MonoBehaviour {
-    // === Configuration Constants ===
-    private const float PUSH_RANGE = 2.5f;           // Maximum distance for push interaction
-    private const float PUSH_COOLDOWN = 1f;          // Cooldown time between successful pushes
-    private const float PUSH_FORCE_BASE = 500f;      // Base push force applied
-    private const float BINGBONG_MULTIPLIER = 10f;   // Force multiplier when holding "BingBong" item
-    private const float STAMINA_COST = 0.1f;         // Stamina consumed per push
+    // ============================== Configuration Constants ===================================================
+    private const float PUSH_RANGE              = 2.5f;         // Maximum distance for push interaction
+    private const float PUSH_COOLDOWN           = 1f;           // Cooldown time between successful pushes
+    private const float PUSH_FORCE_BASE         = 500f;         // Base push force applied
+    private const float BINGBONG_MULTIPLIER     = 10f;          // Force multiplier when holding "BingBong" item
+    private const float STAMINA_COST            = 0.1f;         // Stamina consumed per push
 
-    private const float MAX_CHARGE = 3f;             // Maximum charge duration (seconds)
-    private const float CHARGE_FORCE_MULTIPLIER = 1.5f; // Additional force multiplier based on charge level
-    // ===================================================================================
+    private const float MAX_CHARGE              = 3f;           // Maximum charge duration (seconds)
+    private const float CHARGE_FORCE_MULTIPLIER = 1.5f;         // Additional force multiplier based on charge level
+    private const float ANIMATION_TIME          = 0.25f;        // Fixed animation playback time
+    // ==========================================================================================================
 
-    [Header("Debug & UI")]
-    [SerializeField] private bool showProtectionUI = true;  // Toggle display of protection status UI
-    [SerializeField] private bool showChargeBar = true;     // Toggle display of charge progress bar
-    [SerializeField] private Color chargeBarColor = Color.cyan; // Color of the charge bar
+    // ====================================== Debug & UI ========================================================
+    private bool showProtectionUI               = true;         // Toggle display of protection status UI
+    private bool showChargeBar                  = true;         // Toggle display of charge progress bar
+    private Color chargeBarColor                = Color.cyan;   // Color of the charge bar
 
     private static Texture2D? blankTexture;
 
-    private Character localCharacter = null!;
-    private float coolDownLeft;                   // Remaining cooldown time before next push
-    private float animationCoolDown;              // Duration of active push animation
-    private float animationTime = 0.25f;          // Fixed animation playback time
+    private Character localCharacter            = null!;
+    private float coolDownLeft;                                 // Remaining cooldown time before next push
+    private float animationCoolDown;                            // Duration of active push animation
+    
 
-    private bool bingBong;                        // True if player is holding the "BingBong" item
-    private bool protectionPush;                  // If enabled, blocks incoming push forces
+    private bool bingBong;                                      // True if player is holding the "BingBong" item
+    private bool protectionPush;                                // If enabled, blocks incoming push forces
 
     // Charging system
-    private bool isCharging;                      // Whether the player is currently charging a push
-    private float currentCharge;                  // Current charge level (0 to MAX_CHARGE)
+    private bool isCharging;                                    // Whether the player is currently charging a push
+    private float currentCharge;                                // Current charge level (0 to MAX_CHARGE)
 
-    // Cached components for performance optimization
+    // ====================== Cached components for performance optimization ====================================
     private Character cachedCharacter = null!;
     private Camera mainCamera = null!;
-
+    // ==========================================================================================================
 
     private void Awake() {
         // Cache the Character component on this GameObject
