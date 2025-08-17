@@ -1,6 +1,6 @@
 {
     "name": "PushMod_MesaUpdate",
-    "version_number": "0.5.1",
+    "version_number": "0.5.2",
     "website_url": "https://github.com/goldenstein64/PEAK-PushMod-MesaUpdate",
     "description": "Push your friends around! (Updated for the Mesa!)",
     "dependencies": [
