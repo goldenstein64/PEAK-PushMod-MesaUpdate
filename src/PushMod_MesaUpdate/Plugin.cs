@@ -120,7 +120,7 @@ public class PushManager : MonoBehaviour {
         CharacterAnimations characterAnimations = character.gameObject.GetComponent<CharacterAnimations>();
         Animator animator = characterAnimations.character.refs.animator;
 
-        animator.Play("A_Scout_Reach_Air");
+        animator.Play("A_Scout_Reach_Straight");
     }
 
     [PunRPC]

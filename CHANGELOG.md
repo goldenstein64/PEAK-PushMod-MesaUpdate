@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 0.5.2
+- Fix scout animation
+
 ## Version 0.5.1
 - Forked from original project
 - Updated mod to support the Mesa update
