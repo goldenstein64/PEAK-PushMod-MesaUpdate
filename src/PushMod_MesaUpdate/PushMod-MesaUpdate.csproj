@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <AssemblyName>com.github.goldenstein64.PushMod-MesaUpdate</AssemblyName>
-    <AssemblyTitle>PushMod-MesaUpdate</AssemblyTitle>
+    <AssemblyName>com.github.goldenstein64.PushMod_MesaUpdate</AssemblyName>
+    <AssemblyTitle>PushMod_MesaUpdate</AssemblyTitle>
     <Version>0.5.1</Version>
   </PropertyGroup>
 
