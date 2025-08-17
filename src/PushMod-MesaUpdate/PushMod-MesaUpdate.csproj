@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <AssemblyName>com.github.Cyber-Corvid.PushMod-MesaUpdate</AssemblyName>
+    <AssemblyName>com.github.goldenstein64.PushMod-MesaUpdate</AssemblyName>
     <AssemblyTitle>PushMod-MesaUpdate</AssemblyTitle>
     <Version>0.5.1</Version>
   </PropertyGroup>

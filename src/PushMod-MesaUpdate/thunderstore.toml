@@ -20,7 +20,7 @@ readme = "../../README.md"
 outdir = "../../artifacts/thunderstore/"
 
 [[build.copy]]
-source = "../../artifacts/bin/PushMod/release/com.github.boxofbiscuits97.PushMod.dll"
+source = "../../artifacts/bin/PushMod-MesaUpdate/release/com.github.goldenstein64.PushMod-MesaUpdate.dll"
 target = "plugins/"
 
 [[build.copy]]
