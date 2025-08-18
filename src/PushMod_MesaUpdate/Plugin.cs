@@ -38,7 +38,6 @@ public class PushManager : MonoBehaviour {
     private float coolDownLeft;
     private float animationCoolDown;
     private float animationTime = 0.25f;
-    private float forceMultiplier = 1f;
     private bool bingBong;
 
     private void Awake() {
@@ -70,33 +69,27 @@ public class PushManager : MonoBehaviour {
         else bingBong = false;
 
         if (Input.GetKeyDown(Plugin.keyboardKeybindConfig!.Value)) {
-            Character pushedCharacter;
-
-            RaycastHit HitInfo;
             Transform cameraTransform = Camera.main.transform;
 
-            if (!Physics.Raycast(cameraTransform.position, cameraTransform.forward, out HitInfo, 2.5f)) return;
 
-            pushedCharacter = GetCharacter(HitInfo.transform.gameObject);
-            if (pushedCharacter == null) return;
-
-            if (bingBong) forceMultiplier = 10f;
-            else forceMultiplier = 1f;
-
+            float forceMultiplier = bingBong ? 10f : 1f;
             Vector3 forceDirection = Camera.main.transform.forward * 500 * forceMultiplier;
-
-            Transform sfx = pushedCharacter.gameObject.transform.Find("Scout").Find("SFX").Find("Movement").Find("SFX Jump");
-            if (sfx == null) {
-                Plugin.Log.LogError("Could not find sound effect for pushed character.");
-            }
-            else {
-                sfx.gameObject.SetActive(true);
-            }
-
             coolDownLeft = 1f;
             float staminaUsed = 0.1f;
             localCharacter.UseStamina(staminaUsed, true);
-
+            bool hit = Physics.Raycast(cameraTransform.position, cameraTransform.forward, out RaycastHit HitInfo, 2.5f);
+            Character pushedCharacter;
+            if (hit && GetCharacter(HitInfo.transform.gameObject) is Character otherCharacter) {
+                pushedCharacter = otherCharacter;
+                Transform sfx = otherCharacter.gameObject.transform.Find("Scout").Find("SFX").Find("Movement").Find("SFX Jump");
+                if (sfx is not null) {
+                    sfx.gameObject.SetActive(true);
+                } else {
+                    Plugin.Log.LogError("Could not find sound effect for pushed character.");
+                }
+            } else {
+                pushedCharacter = localCharacter;
+            }
             Plugin.Log.LogInfo("Sending Push RPC Event");
             localCharacter.view.RPC("PushPlayer_Rpc", RpcTarget.All, new object[]
             {

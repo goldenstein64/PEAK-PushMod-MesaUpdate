@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 0.5.3
+- Characters can push themselves if they don't find a character to push
+
 ## Version 0.5.2
 - Fix scout animation
 
