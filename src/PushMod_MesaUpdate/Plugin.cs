@@ -162,8 +162,7 @@ public class PushManager : MonoBehaviour {
             return;
 
         // Retrieve the Character component from the hit object
-        Character? pushedCharacter = GetCharacter(hitInfo.transform.gameObject);
-        if (pushedCharacter is null) return;
+        if (GetCharacter(hitInfo.transform.gameObject) is not Character pushedCharacter) return;
 
         // Calculate final push force with multipliers
         float chargeMultiplier = 1f + (currentCharge / MAX_CHARGE) * CHARGE_FORCE_MULTIPLIER;
@@ -178,7 +177,7 @@ public class PushManager : MonoBehaviour {
 
         // Apply cooldown and stamina cost
         coolDownLeft = PUSH_COOLDOWN;
-        localCharacter.UseStamina(STAMINA_COST * (currentCharge > 1f ? currentCharge : 1f), true);
+        localCharacter.UseStamina(STAMINA_COST * Mathf.Max(currentCharge, 1f), true);
 
         // Send RPC to all clients to synchronize the push
         Plugin.Log.LogInfo("Sending Push RPC Event");
