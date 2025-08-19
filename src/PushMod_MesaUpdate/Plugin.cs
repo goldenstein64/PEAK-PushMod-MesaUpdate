@@ -70,7 +70,7 @@ public class PushManager : MonoBehaviour {
     private void Awake() {
         // Cache the Character component on this GameObject
         cachedCharacter = GetComponent<Character>();
-        if (cachedCharacter == null) {
+        if (cachedCharacter is null) {
             Debug.LogError("[PushManager] Character component not found on GameObject!", gameObject);
             enabled = false;
             return;
@@ -82,7 +82,7 @@ public class PushManager : MonoBehaviour {
 
             // Cache main camera for raycasting
             mainCamera = Camera.main;
-            if (mainCamera == null) {
+            if (mainCamera is null) {
                 Debug.LogError("[PushManager] Main camera not found!");
                 enabled = false;
             }
@@ -102,12 +102,12 @@ public class PushManager : MonoBehaviour {
         animationCoolDown -= Time.deltaTime;
 
         // Play push animation
-        if (animationCoolDown > 0f && cachedCharacter != null) {
+        if (animationCoolDown > 0f && cachedCharacter is not null) {
             PlayPushAnimation(cachedCharacter);
         }
 
         if (coolDownLeft > 0f) return;
-        if (localCharacter == null) return;
+        if (localCharacter is null) return;
         if (!localCharacter.view.IsMine) return;
         if (!localCharacter.data.fullyConscious) return;
         if (localCharacter.data.isCarried) return;
@@ -117,7 +117,7 @@ public class PushManager : MonoBehaviour {
 
         // Check if the current held item is "BingBong"
         Item? currentItem = localCharacter.data.currentItem;
-        bingBong = currentItem != null && currentItem.itemTags == Item.ItemTags.BingBong; // Multi-language support 🤡
+        bingBong = currentItem is not null && currentItem.itemTags is Item.ItemTags.BingBong; // Multi-language support 🤡
 
         // Charging is active — we update the visualization
         if (isCharging) {
@@ -147,7 +147,7 @@ public class PushManager : MonoBehaviour {
     /// If a valid character is hit, applies force via RPC.
     /// </summary>
     private void TryPushTarget() {
-        if (mainCamera == null) return;
+        if (mainCamera is null) return;
 
         // Perform raycast from camera forward within push range
         if (!Physics.Raycast(mainCamera.transform.position, mainCamera.transform.forward, out RaycastHit hitInfo, PUSH_RANGE, LayerMask.GetMask("Character")))
@@ -155,7 +155,7 @@ public class PushManager : MonoBehaviour {
 
         // Retrieve the Character component from the hit object
         Character? pushedCharacter = GetCharacter(hitInfo.transform.gameObject);
-        if (pushedCharacter == null) return;
+        if (pushedCharacter is null) return;
 
         // Calculate final push force with multipliers
         float chargeMultiplier = 1f + (currentCharge / MAX_CHARGE) * CHARGE_FORCE_MULTIPLIER;
@@ -216,7 +216,7 @@ public class PushManager : MonoBehaviour {
         // === UI: Charge Bar ===
         if (showChargeBar && isCharging) {
             // Initialize blank texture if not already created
-            if (blankTexture == null) {
+            if (blankTexture is null) {
                 blankTexture = MakeTex(1, 1, Color.white);
             }
 
@@ -250,7 +250,7 @@ public class PushManager : MonoBehaviour {
     /// <param name="obj">The GameObject to start searching from</param>
     /// <returns>The Character component if found; otherwise null</returns>
     private Character? GetCharacter(GameObject? obj) {
-        if (obj == null) return null;
+        if (obj is null) return null;
 
         // Check current object first
         if (obj.TryGetComponent(out Character character))
@@ -258,7 +258,7 @@ public class PushManager : MonoBehaviour {
 
         // Traverse up the hierarchy
         Transform? parent = obj.transform.parent;
-        if (parent != null) {
+        if (parent is not null) {
             return GetCharacter(parent.gameObject);
         }
 
@@ -272,9 +272,9 @@ public class PushManager : MonoBehaviour {
     /// </summary>
     /// <param name="character">The character to animate</param>
     private void PlayPushAnimation(Character? character) {
-        if (character == null) return;
+        if (character is null) return;
         CharacterAnimations? charAnims = character.GetComponent<CharacterAnimations>();
-        if (charAnims == null) return;
+        if (charAnims is null) return;
         Animator? animator = charAnims.character.refs.animator;
         animator?.Play("A_Scout_Reach_Straight");
     }
@@ -286,7 +286,7 @@ public class PushManager : MonoBehaviour {
     /// <param name="character">The character to play SFX on</param>
     private void PlayPushSFX(Character character) {
         Transform sfx = character.gameObject.transform.Find("Scout").Find("SFX").Find("Movement").Find("SFX Jump");
-        if (sfx == null) {
+        if (sfx is null) {
             Plugin.Log.LogError("Could not find sound effect for pushed character.");
         }
         else {
@@ -312,14 +312,14 @@ public class PushManager : MonoBehaviour {
         }
 
         // Ensure local character is identified
-        if (localCharacter == null) {
+        if (localCharacter is null) {
             foreach (Character character in Character.AllCharacters) {
                 if (character.IsLocal) {
                     localCharacter = character;
                     break;
                 }
             }
-            if (localCharacter == null) {
+            if (localCharacter is null) {
                 Plugin.Log.LogError("Local Character is still null in RPC!");
                 return;
             }
@@ -328,7 +328,7 @@ public class PushManager : MonoBehaviour {
         // Trigger push animation on the sender (if visible on this client)
         if (Character.GetCharacterWithPhotonID(senderID, out Character senderCharacter)) {
             PushManager senderPushManager = senderCharacter.GetComponent<PushManager>();
-            if (senderPushManager != null) {
+            if (senderPushManager is not null) {
                 senderPushManager.animationCoolDown = ANIMATION_TIME;
             }
         }
