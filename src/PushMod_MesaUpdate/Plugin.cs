@@ -180,7 +180,7 @@ public class PushManager : MonoBehaviour {
 
         // Apply cooldown and stamina cost
         coolDownLeft = PUSH_COOLDOWN;
-        localCharacter.UseStamina(STAMINA_COST * currentCharge, true);
+        localCharacter.UseStamina(STAMINA_COST * (currentCharge > 1f ? currentCharge : 1f), true);
 
         // Send RPC to all clients to synchronize the push
         Plugin.Log.LogInfo("Sending Push RPC Event");
