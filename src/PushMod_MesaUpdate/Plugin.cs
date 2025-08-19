@@ -54,7 +54,6 @@ public class PushManager : MonoBehaviour {
     private Character localCharacter            = null!;
     private float coolDownLeft;                                 // Remaining cooldown time before next push
     private float animationCoolDown;                            // Duration of active push animation
-    private float animationTime = 0.25f;
 
     private bool bingBong;                                      // True if player is holding the "BingBong" item
     private bool protectionPush;                                // If enabled, blocks incoming push forces
@@ -113,13 +112,14 @@ public class PushManager : MonoBehaviour {
         if (!localCharacter.data.fullyConscious) return;
         if (localCharacter.data.isCarried) return;
         if (localCharacter.data.isClimbing) return;
-        // Handle input for charge-based pushing
-        HandleChargeInput();
 
         // Check if the current held item is "BingBong"
         Item? currentItem = localCharacter.data.currentItem;
         bingBong = currentItem != null && currentItem.itemTags == Item.ItemTags.BingBong; // Multi-language support 🤡
-
+        
+        // Handle input for charge-based pushing
+        HandleChargeInput();
+        
         // Charging is active — we update the visualization
         if (isCharging) {
             currentCharge += Time.deltaTime;
@@ -132,14 +132,23 @@ public class PushManager : MonoBehaviour {
     /// Charging begins on key down and applies the push on key up.
     /// </summary>
     private void HandleChargeInput() {
-        if (Input.GetKeyDown(Plugin.PConfig.PushKey) && !isCharging && coolDownLeft <= 0f) {
-            isCharging = true;
-            currentCharge = 0f;
-            Plugin.Log.LogInfo("Started charging push...");
+        if (Plugin.PConfig.CanCharge)
+        {
+            if (Input.GetKeyDown(Plugin.PConfig.PushKey) && !isCharging && coolDownLeft <= 0f) {
+                isCharging = true;
+                currentCharge = 0f;
+                Plugin.Log.LogInfo("Started charging push...");
+            }
+            if (Input.GetKeyUp(Plugin.PConfig.PushKey) && isCharging) {
+                isCharging = false;
+                TryPushTarget();
+            }
         }
-        if (Input.GetKeyUp(Plugin.PConfig.PushKey) && isCharging) {
-            isCharging = false;
-            TryPushTarget();
+        else 
+        {
+            if (Input.GetKeyDown(Plugin.PConfig.PushKey) && coolDownLeft <= 0f) {
+                TryPushTarget();
+            }
         }
     }
 
@@ -330,7 +339,7 @@ public class PushManager : MonoBehaviour {
         if (Character.GetCharacterWithPhotonID(senderID, out Character senderCharacter)) {
             PushManager senderPushManager = senderCharacter.GetComponent<PushManager>();
             if (senderPushManager != null) {
-                senderPushManager.animationCoolDown = animationTime;
+                senderPushManager.animationCoolDown = ANIMATION_TIME;
             }
         }
         else {
