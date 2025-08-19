@@ -11,9 +11,11 @@ public class ConfigurationHandler {
 
     private ConfigEntry<string> _configPushKey;
     private ConfigEntry<string> _configProtectionKey;
+    private ConfigEntry<bool> _configcanCharge;
 
     public KeyCode PushKey => ParseKeyCode(_configPushKey.Value, KeyCode.F);
     public KeyCode ProtectionKey => ParseKeyCode(_configProtectionKey.Value, KeyCode.F11);
+    public bool CanCharge => _configcanCharge.Value;
 
     public ConfigurationHandler() {
         Plugin.Log.LogInfo("PushMod ConfigurationHandler initialising");
@@ -30,10 +32,17 @@ public class ConfigurationHandler {
             "F10",
             "The keyboard key used to enable protection push. Example: F, E, G, etc."
         );
+        _configcanCharge = config.Bind(
+            "Push Settings",
+            "CanCharge",
+            true,
+            "The setting includes charging force when pushed"
+        );
 
         Plugin.Log.LogInfo("PushMod Configuration loaded:");
         Plugin.Log.LogInfo($"  PushKey: {PushKey}");
         Plugin.Log.LogInfo($"  ProtectionKey: {ProtectionKey}");
+        Plugin.Log.LogInfo($"  CanCharge: {CanCharge}");
 
         Plugin.Log.LogInfo("PushMod ConfigurationHandler initialised");
     }

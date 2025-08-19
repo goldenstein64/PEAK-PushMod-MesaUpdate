@@ -112,12 +112,13 @@ public class PushManager : MonoBehaviour {
         if (!localCharacter.data.fullyConscious) return;
         if (localCharacter.data.isCarried) return;
         if (localCharacter.data.isClimbing) return;
-        // Handle input for charge-based pushing
-        HandleChargeInput();
 
         // Check if the current held item is "BingBong"
         Item? currentItem = localCharacter.data.currentItem;
         bingBong = currentItem is not null && currentItem.itemTags is Item.ItemTags.BingBong; // Multi-language support 🤡
+
+        // Handle input for charge-based pushing
+        HandleChargeInput();
 
         // Charging is active — we update the visualization
         if (isCharging) {
@@ -131,14 +132,21 @@ public class PushManager : MonoBehaviour {
     /// Charging begins on key down and applies the push on key up.
     /// </summary>
     private void HandleChargeInput() {
-        if (Input.GetKeyDown(Plugin.PConfig.PushKey) && !isCharging && coolDownLeft <= 0f) {
-            isCharging = true;
-            currentCharge = 0f;
-            Plugin.Log.LogInfo("Started charging push...");
+        if (Plugin.PConfig.CanCharge) {
+            if (Input.GetKeyDown(Plugin.PConfig.PushKey) && !isCharging && coolDownLeft <= 0f) {
+                isCharging = true;
+                currentCharge = 0f;
+                Plugin.Log.LogInfo("Started charging push...");
+            }
+            if (Input.GetKeyUp(Plugin.PConfig.PushKey) && isCharging) {
+                isCharging = false;
+                TryPushTarget();
+            }
         }
-        if (Input.GetKeyUp(Plugin.PConfig.PushKey) && isCharging) {
-            isCharging = false;
-            TryPushTarget();
+        else {
+            if (Input.GetKeyDown(Plugin.PConfig.PushKey) && coolDownLeft <= 0f) {
+                TryPushTarget();
+            }
         }
     }
 
@@ -170,7 +178,7 @@ public class PushManager : MonoBehaviour {
 
         // Apply cooldown and stamina cost
         coolDownLeft = PUSH_COOLDOWN;
-        localCharacter.UseStamina(STAMINA_COST * currentCharge, true);
+        localCharacter.UseStamina(STAMINA_COST * (currentCharge > 1f ? currentCharge : 1f), true);
 
         // Send RPC to all clients to synchronize the push
         Plugin.Log.LogInfo("Sending Push RPC Event");
