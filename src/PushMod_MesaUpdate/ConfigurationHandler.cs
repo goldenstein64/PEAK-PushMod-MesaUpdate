@@ -29,7 +29,7 @@ public class ConfigurationHandler {
         _configProtectionKey = config.Bind(
             "Push Settings",
             "ProtectionKey",
-            "F10",
+            "F11",
             "The keyboard key used to enable protection push. Example: F, E, G, etc."
         );
         _configcanCharge = config.Bind(
