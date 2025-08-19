@@ -271,7 +271,7 @@ public class PushManager : MonoBehaviour {
     /// Uses the character's animator to trigger the reach animation.
     /// </summary>
     /// <param name="character">The character to animate</param>
-    private void PlayPushAnimation(Character character) {
+    private void PlayPushAnimation(Character? character) {
         if (character == null) return;
         CharacterAnimations? charAnims = character.GetComponent<CharacterAnimations>();
         if (charAnims == null) return;
