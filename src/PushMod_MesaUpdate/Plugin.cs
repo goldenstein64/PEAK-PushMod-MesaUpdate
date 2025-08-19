@@ -183,13 +183,13 @@ public class PushManager : MonoBehaviour {
     /// </summary>
     /// <param name="width">Width of the texture</param>
     /// <param name="height">Height of the texture</param>
-    /// <param name="col">Color to fill the texture with</param>
+    /// <param name="color">Color to fill the texture with</param>
     /// <returns>A fully colored Texture2D</returns>
-    private Texture2D MakeTex(int width, int height, Color col) {
-        Color[] pix = new Color[width * height];
-        for (int i = 0; i < pix.Length; ++i) pix[i] = col;
+    private Texture2D MakeTex(int width, int height, Color color) {
+        Color[] pixels = new Color[width * height];
+        for (int i = 0; i < pixels.Length; ++i) pixels[i] = color;
         Texture2D result = new Texture2D(width, height);
-        result.SetPixels(pix);
+        result.SetPixels(pixels);
         result.Apply();
         return result;
     }
