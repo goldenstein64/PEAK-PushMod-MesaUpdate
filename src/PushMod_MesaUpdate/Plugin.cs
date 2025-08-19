@@ -1,4 +1,4 @@
-﻿using BepInEx;
+using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
 using Photon.Pun;
@@ -249,7 +249,7 @@ public class PushManager : MonoBehaviour {
                 alignment = TextAnchor.MiddleCenter,
                 normal = { textColor = Color.black }
             };
-            GUI.Label(new Rect(x, y, barWidth, 20), $"Push Charge: {(progress * 100):F0}%", textStyle);
+            GUI.Label(new Rect(x, y, barWidth, 20), $"Push Charge: {(progress * 100):F0}%", textStyle);  
         }
     }
 
