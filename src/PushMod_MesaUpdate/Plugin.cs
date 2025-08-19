@@ -54,7 +54,6 @@ public class PushManager : MonoBehaviour {
     private Character localCharacter = null!;
     private float coolDownLeft;                                 // Remaining cooldown time before next push
     private float animationCoolDown;                            // Duration of active push animation
-    private float animationTime = 0.25f;
 
     private bool bingBong;                                      // True if player is holding the "BingBong" item
     private bool protectionPush;                                // If enabled, blocks incoming push forces
@@ -330,7 +329,7 @@ public class PushManager : MonoBehaviour {
         if (Character.GetCharacterWithPhotonID(senderID, out Character senderCharacter)) {
             PushManager senderPushManager = senderCharacter.GetComponent<PushManager>();
             if (senderPushManager != null) {
-                senderPushManager.animationCoolDown = animationTime;
+                senderPushManager.animationCoolDown = ANIMATION_TIME;
             }
         }
         else {
