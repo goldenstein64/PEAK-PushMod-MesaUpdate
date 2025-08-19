@@ -54,7 +54,7 @@ public class PushManager : MonoBehaviour {
     private Character localCharacter            = null!;
     private float coolDownLeft;                                 // Remaining cooldown time before next push
     private float animationCoolDown;                            // Duration of active push animation
-    
+    private float animationTime = 0.25f;
 
     private bool bingBong;                                      // True if player is holding the "BingBong" item
     private bool protectionPush;                                // If enabled, blocks incoming push forces
