@@ -13,7 +13,7 @@ public partial class Plugin : BaseUnityPlugin {
 
     private void Awake() {
         Log = Logger;
-        PConfig = new ConfigurationHandler();
+        PConfig = new ConfigurationHandler(this);
         Log.LogInfo($"Plugin {Name} is loaded!");
         Harmony.CreateAndPatchAll(typeof(PushPatch));
     }

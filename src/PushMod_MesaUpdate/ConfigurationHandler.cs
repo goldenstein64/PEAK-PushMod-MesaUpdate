@@ -7,7 +7,6 @@ using UnityEngine;
 namespace PushMod;
 
 public class ConfigurationHandler {
-    private ConfigFile config = new ConfigFile(Path.Combine(Paths.ConfigPath, $"{Plugin.Id}.cfg"), true);
 
     private ConfigEntry<string> _configPushKey;
     private ConfigEntry<string> _configProtectionKey;
@@ -17,22 +16,21 @@ public class ConfigurationHandler {
     public KeyCode ProtectionKey => ParseKeyCode(_configProtectionKey.Value, KeyCode.F11);
     public bool CanCharge => _configcanCharge.Value;
 
-    public ConfigurationHandler() {
+    public ConfigurationHandler(Plugin instance) {
         Plugin.Log.LogInfo("PushMod ConfigurationHandler initialising");
-
-        _configPushKey = config.Bind(
+        _configPushKey = instance.Config.Bind(
             "Push Settings",
             "PushKey",
             "F",
             "The keyboard key used to push key. Example: F, E, G, etc."
         );
-        _configProtectionKey = config.Bind(
+        _configProtectionKey = instance.Config.Bind(
             "Push Settings",
             "ProtectionKey",
             "F11",
             "The keyboard key used to enable protection push. Example: F, E, G, etc."
         );
-        _configcanCharge = config.Bind(
+        _configcanCharge = instance.Config.Bind(
             "Push Settings",
             "CanCharge",
             true,
