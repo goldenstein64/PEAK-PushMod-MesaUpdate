@@ -186,15 +186,10 @@ public class PushManager : MonoBehaviour {
         // Apply cooldown and stamina cost
         coolDownLeft = PUSH_COOLDOWN;
         localCharacter.UseStamina(STAMINA_COST * Mathf.Max(currentCharge, 1f), true);
+
         // Send RPC to all clients to synchronize the push
-        if (local) {
-            Plugin.Log.LogInfo("Local Push");
-            pushedCharacter.AddForce(forceDirection);
-        }
-        else {
-            Plugin.Log.LogInfo("Sending Push RPC Event");
-            localCharacter.view.RPC("PushPlayer_Rpc", RpcTarget.All, pushedCharacter.view.ViewID, forceDirection, localCharacter.view.ViewID);
-        }
+        Plugin.Log.LogInfo("Sending Push RPC Event");
+        localCharacter.view.RPC("PushPlayer_Rpc", RpcTarget.All, pushedCharacter.view.ViewID, forceDirection, localCharacter.view.ViewID);
     }
 
     private void TryPushSelf() {
