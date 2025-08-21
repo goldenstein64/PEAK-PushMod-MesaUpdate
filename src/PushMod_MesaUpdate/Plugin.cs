@@ -133,19 +133,26 @@ public class PushManager : MonoBehaviour {
     /// </summary>
     private void HandleChargeInput() {
         if (Plugin.PConfig.CanCharge) {
-            if (Input.GetKeyDown(Plugin.PConfig.PushKey) && !isCharging && coolDownLeft <= 0f) {
+            if ((Input.GetKeyDown(Plugin.PConfig.PushKey) || Input.GetKeyDown(Plugin.PConfig.SelfPushKey)) && !isCharging && coolDownLeft <= 0f) {
                 isCharging = true;
                 currentCharge = 0f;
                 Plugin.Log.LogInfo("Started charging push...");
             }
-            if (Input.GetKeyUp(Plugin.PConfig.PushKey) && isCharging) {
+            if (Input.GetKeyUp(Plugin.PConfig.PushKey) && !Input.GetKey(Plugin.PConfig.SelfPushKey) && isCharging) {
                 isCharging = false;
                 TryPushTarget();
+            }
+            if (Input.GetKeyUp(Plugin.PConfig.SelfPushKey) && !Input.GetKey(Plugin.PConfig.PushKey) && isCharging) {
+                isCharging = false;
+                TryPushSelf();
             }
         }
         else {
             if (Input.GetKeyDown(Plugin.PConfig.PushKey) && coolDownLeft <= 0f) {
                 TryPushTarget();
+            }
+            if (Input.GetKeyDown(Plugin.PConfig.SelfPushKey) && coolDownLeft <= 0f) {
+                TryPushSelf();
             }
         }
     }
@@ -163,6 +170,7 @@ public class PushManager : MonoBehaviour {
 
         // Retrieve the Character component from the hit object
         if (GetCharacter(hitInfo.transform.gameObject) is not Character pushedCharacter) return;
+        if (pushedCharacter == localCharacter) return;
 
         // Calculate final push force with multipliers
         float chargeMultiplier = 1f + (currentCharge / MAX_CHARGE) * CHARGE_FORCE_MULTIPLIER;
@@ -182,6 +190,29 @@ public class PushManager : MonoBehaviour {
         // Send RPC to all clients to synchronize the push
         Plugin.Log.LogInfo("Sending Push RPC Event");
         localCharacter.view.RPC("PushPlayer_Rpc", RpcTarget.All, pushedCharacter.view.ViewID, forceDirection, localCharacter.view.ViewID);
+    }
+
+    private void TryPushSelf() {
+        if (mainCamera is null) return;
+
+        // Calculate final push force with multipliers
+        float chargeMultiplier = 1f + (currentCharge / MAX_CHARGE) * CHARGE_FORCE_MULTIPLIER;
+        float bingBongMultiplier = bingBong ? BINGBONG_MULTIPLIER : 1f;
+        float totalMultiplier = bingBongMultiplier + chargeMultiplier;
+        Vector3 forceDirection = mainCamera.transform.forward * PUSH_FORCE_BASE * totalMultiplier;
+
+        Plugin.Log.LogInfo($"Push force direction: {forceDirection}");
+
+        // Trigger jump SFX on the target (temporary feedback)
+        PlayPushSFX(localCharacter);
+
+        // Apply cooldown and stamina cost
+        coolDownLeft = PUSH_COOLDOWN;
+        localCharacter.UseStamina(STAMINA_COST * Mathf.Max(currentCharge, 1f), true);
+
+        // Send RPC to all clients to synchronize the push
+        Plugin.Log.LogInfo("Sending Push RPC Event");
+        localCharacter.view.RPC("PushPlayer_Rpc", RpcTarget.All, localCharacter.view.ViewID, forceDirection, localCharacter.view.ViewID);
     }
 
     /// <summary>
