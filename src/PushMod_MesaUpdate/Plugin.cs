@@ -175,7 +175,7 @@ public class PushManager : MonoBehaviour {
         // Calculate final push force with multipliers
         float chargeMultiplier = 1f + (currentCharge / MAX_CHARGE) * CHARGE_FORCE_MULTIPLIER;
         float bingBongMultiplier = bingBong ? BINGBONG_MULTIPLIER : 1f;
-        float totalMultiplier = bingBongMultiplier + chargeMultiplier;
+        float totalMultiplier = bingBongMultiplier * chargeMultiplier;
         Vector3 forceDirection = mainCamera.transform.forward * PUSH_FORCE_BASE * totalMultiplier;
 
         Plugin.Log.LogInfo($"Push force direction: {forceDirection}");
