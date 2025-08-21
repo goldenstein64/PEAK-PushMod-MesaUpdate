@@ -9,9 +9,11 @@ namespace PushMod;
 public class ConfigurationHandler {
 
     private ConfigEntry<KeyCode> _configPushKey;
+    private ConfigEntry<KeyCode> _configSelfPushKey;
     private ConfigEntry<KeyCode> _configProtectionKey;
     private ConfigEntry<bool> _configcanCharge;
 
+    public KeyCode SelfPushKey => _configSelfPushKey.Value;
     public KeyCode PushKey => _configPushKey.Value;
     public KeyCode ProtectionKey => _configProtectionKey.Value;
     public bool CanCharge => _configcanCharge.Value;
@@ -22,7 +24,13 @@ public class ConfigurationHandler {
             section: "Push Settings",
             key: "PushKey",
             defaultValue: KeyCode.F,
-            description: "The keyboard key used to push key. Example: F, E, G, etc."
+            description: "The keyboard key used to push. Example: F, E, G, etc."
+        );
+        _configSelfPushKey = instance.Config.Bind(
+            section: "Push Settings",
+            key: "SelfPushKey",
+            defaultValue: KeyCode.G,
+            description: "The keyboard key used to push yourself. Example: F, E, G, etc."
         );
         _configProtectionKey = instance.Config.Bind(
             section: "Push Settings",
