@@ -39,7 +39,7 @@ public class PushManager : MonoBehaviour {
     private const float BINGBONG_MULTIPLIER = 10f;              // Force multiplier when holding "BingBong" item
     private const float STAMINA_COST = 0.1f;                    // Stamina consumed per push
 
-    private const float MAX_CHARGE = 3f;                        // Maximum charge duration (seconds)
+    private const float MAX_CHARGE = 1f;                        // Maximum charge duration (seconds)
     private const float CHARGE_FORCE_MULTIPLIER = 1.5f;         // Additional force multiplier based on charge level
     private const float ANIMATION_TIME = 0.25f;                 // Fixed animation playback time
     // ==========================================================================================================
