@@ -52,6 +52,7 @@ public class PushManager : MonoBehaviour {
     private static Texture2D? blankTexture;
 
     private Character localCharacter = null!;
+    private Character? pushedCharacter = null!;
     private float coolDownLeft;                                 // Remaining cooldown time before next push
     private float animationCoolDown;                            // Duration of active push animation
 
@@ -140,19 +141,19 @@ public class PushManager : MonoBehaviour {
             }
             if (Input.GetKeyUp(Plugin.PConfig.PushKey) && !Input.GetKey(Plugin.PConfig.SelfPushKey) && isCharging) {
                 isCharging = false;
-                TryPushTarget();
+                TryPushTarget(false);
             }
             if (Input.GetKeyUp(Plugin.PConfig.SelfPushKey) && !Input.GetKey(Plugin.PConfig.PushKey) && isCharging) {
                 isCharging = false;
-                TryPushSelf();
+                TryPushTarget(true);
             }
         }
         else {
             if (Input.GetKeyDown(Plugin.PConfig.PushKey) && coolDownLeft <= 0f) {
-                TryPushTarget();
+                TryPushTarget(false);
             }
             if (Input.GetKeyDown(Plugin.PConfig.SelfPushKey) && coolDownLeft <= 0f) {
-                TryPushSelf();
+                TryPushTarget(true);
             }
         }
     }
@@ -161,16 +162,22 @@ public class PushManager : MonoBehaviour {
     /// Attempts to perform a push using a forward raycast from the main camera.
     /// If a valid character is hit, applies force via RPC.
     /// </summary>
-    private void TryPushTarget() {
+    private void TryPushTarget(bool self) {
         if (mainCamera is null) return;
 
-        // Perform raycast from camera forward within push range
-        if (!Physics.Raycast(mainCamera.transform.position, mainCamera.transform.forward, out RaycastHit hitInfo, PUSH_RANGE, LayerMask.GetMask("Character")))
-            return;
 
-        // Retrieve the Character component from the hit object
-        if (GetCharacter(hitInfo.transform.gameObject) is not Character pushedCharacter) return;
-        if (pushedCharacter == localCharacter) return;
+        if (self) {
+            pushedCharacter = localCharacter;
+        }
+        else {
+            // Perform raycast from camera forward within push range
+            if (!Physics.Raycast(mainCamera.transform.position, mainCamera.transform.forward, out RaycastHit hitInfo, PUSH_RANGE, LayerMask.GetMask("Character")))
+                return;
+
+            // Retrieve the Character component from the hit object
+            pushedCharacter = GetCharacter(hitInfo.transform.gameObject);
+            if (pushedCharacter == null || pushedCharacter == localCharacter) return;
+        }
 
         // Calculate final push force with multipliers
         float chargeMultiplier = 1f + (currentCharge / MAX_CHARGE) * CHARGE_FORCE_MULTIPLIER;
@@ -190,29 +197,6 @@ public class PushManager : MonoBehaviour {
         // Send RPC to all clients to synchronize the push
         Plugin.Log.LogInfo("Sending Push RPC Event");
         localCharacter.view.RPC("PushPlayer_Rpc", RpcTarget.All, pushedCharacter.view.ViewID, forceDirection, localCharacter.view.ViewID);
-    }
-
-    private void TryPushSelf() {
-        if (mainCamera is null) return;
-
-        // Calculate final push force with multipliers
-        float chargeMultiplier = 1f + (currentCharge / MAX_CHARGE) * CHARGE_FORCE_MULTIPLIER;
-        float bingBongMultiplier = bingBong ? BINGBONG_MULTIPLIER : 1f;
-        float totalMultiplier = bingBongMultiplier + chargeMultiplier;
-        Vector3 forceDirection = mainCamera.transform.forward * PUSH_FORCE_BASE * totalMultiplier;
-
-        Plugin.Log.LogInfo($"Push force direction: {forceDirection}");
-
-        // Trigger jump SFX on the target (temporary feedback)
-        PlayPushSFX(localCharacter);
-
-        // Apply cooldown and stamina cost
-        coolDownLeft = PUSH_COOLDOWN;
-        localCharacter.UseStamina(STAMINA_COST * Mathf.Max(currentCharge, 1f), true);
-
-        // Send RPC to all clients to synchronize the push
-        Plugin.Log.LogInfo("Sending Push RPC Event");
-        localCharacter.view.RPC("PushPlayer_Rpc", RpcTarget.All, localCharacter.view.ViewID, forceDirection, localCharacter.view.ViewID);
     }
 
     /// <summary>
