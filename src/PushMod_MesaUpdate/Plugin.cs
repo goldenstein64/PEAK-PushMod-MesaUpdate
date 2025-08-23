@@ -310,9 +310,8 @@ public class PushManager : MonoBehaviour {
     /// Used as audio feedback when a push is applied.
     /// </summary>
     /// <param name="character">The character to play SFX on</param>
-    private void PlayPushSFX(Character character,int test = 0) {
+    private void PlayPushSFX(Character character) {
         Transform sfx = character.gameObject.transform.Find("Scout").Find("SFX").Find("Movement").Find("SFX Jump");
-        Plugin.Log.LogInfo($"{test} PlayPushSFX Transform : {sfx}");
         if (sfx is null) {
             Plugin.Log.LogError("Could not find sound effect for pushed character.");
         }
