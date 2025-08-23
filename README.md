@@ -11,3 +11,4 @@ All players must have this mod installed to work. You will not be pushed if you 
 
 # Credits
 This is a fork of the original PushMod by boxofbiscuits97, all I did was edit it slightly to make it work on the new update!
+Modified and improved by AngelHeal 18.08.2025.
