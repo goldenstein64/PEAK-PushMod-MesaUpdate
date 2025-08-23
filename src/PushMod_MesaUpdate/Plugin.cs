@@ -2,6 +2,7 @@
 using BepInEx.Logging;
 using HarmonyLib;
 using Photon.Pun;
+using System.Linq;
 using UnityEngine;
 
 namespace PushMod;
@@ -42,6 +43,7 @@ public class PushManager : MonoBehaviour {
     private const float MAX_CHARGE = 1f;                        // Maximum charge duration (seconds)
     private const float CHARGE_FORCE_MULTIPLIER = 1.5f;         // Additional force multiplier based on charge level
     private const float ANIMATION_TIME = 0.25f;                 // Fixed animation playback time
+    private const float MAX_STAMINA_COST_MULTIPLIER = 3f;       // Maximum stamina cost multiplier.
     // ==========================================================================================================
 
     // ====================================== Debug & UI ========================================================
@@ -52,7 +54,7 @@ public class PushManager : MonoBehaviour {
     private static Texture2D? blankTexture;
 
     private Character localCharacter = null!;
-    private Character? pushedCharacter = null!;
+    private Character? pushedCharacter;
     private float coolDownLeft;                                 // Remaining cooldown time before next push
     private float animationCoolDown;                            // Duration of active push animation
 
@@ -99,8 +101,8 @@ public class PushManager : MonoBehaviour {
         }
 
         // Update cooldown timers
-        coolDownLeft -= Time.deltaTime;
-        animationCoolDown -= Time.deltaTime;
+        if (coolDownLeft > 0f) coolDownLeft -= Time.deltaTime;
+        if (animationCoolDown > 0f) animationCoolDown -= Time.deltaTime;
 
         // Play push animation
         if (animationCoolDown > 0f && cachedCharacter is not null) {
@@ -180,7 +182,7 @@ public class PushManager : MonoBehaviour {
         }
 
         // Calculate final push force with multipliers
-        float chargeMultiplier = 1f + (currentCharge / MAX_CHARGE) * CHARGE_FORCE_MULTIPLIER;
+        float chargeMultiplier = 1f + ((currentCharge / MAX_CHARGE) * CHARGE_FORCE_MULTIPLIER);
         float bingBongMultiplier = bingBong ? BINGBONG_MULTIPLIER : 1f;
         float totalMultiplier = bingBongMultiplier * chargeMultiplier;
         Vector3 forceDirection = mainCamera.transform.forward * PUSH_FORCE_BASE * totalMultiplier;
@@ -188,11 +190,13 @@ public class PushManager : MonoBehaviour {
         Plugin.Log.LogInfo($"Push force direction: {forceDirection}");
 
         // Trigger jump SFX on the target (temporary feedback)
-        PlayPushSFX(pushedCharacter);
+        if (!self) {
+            PlayPushSFX(pushedCharacter);
+        }  
 
         // Apply cooldown and stamina cost
         coolDownLeft = PUSH_COOLDOWN;
-        localCharacter.UseStamina(STAMINA_COST * Mathf.Max(currentCharge, 1f), true);
+        localCharacter.UseStamina(STAMINA_COST * ((currentCharge / MAX_CHARGE) * MAX_STAMINA_COST_MULTIPLIER), true);
 
         // Send RPC to all clients to synchronize the push
         Plugin.Log.LogInfo("Sending Push RPC Event");
@@ -306,8 +310,9 @@ public class PushManager : MonoBehaviour {
     /// Used as audio feedback when a push is applied.
     /// </summary>
     /// <param name="character">The character to play SFX on</param>
-    private void PlayPushSFX(Character character) {
+    private void PlayPushSFX(Character character,int test = 0) {
         Transform sfx = character.gameObject.transform.Find("Scout").Find("SFX").Find("Movement").Find("SFX Jump");
+        Plugin.Log.LogInfo($"{test} PlayPushSFX Transform : {sfx}");
         if (sfx is null) {
             Plugin.Log.LogError("Could not find sound effect for pushed character.");
         }
@@ -327,6 +332,15 @@ public class PushManager : MonoBehaviour {
     private void PushPlayer_Rpc(int viewID, Vector3 force, int senderID) {
         Plugin.Log.LogInfo($"Received Push RPC Event for ID: {viewID}, Force: {force}, from SenderID: {senderID}");
 
+        // Trigger push animation on the sender (if visible on this client)
+        if (Character.GetCharacterWithPhotonID(senderID, out Character senderCharacter)) {
+            if (senderCharacter.TryGetComponent<PushManager>(out var senderPushManager)) {
+                senderPushManager.animationCoolDown = ANIMATION_TIME;
+            }
+        }
+        else {
+            Plugin.Log.LogWarning($"Could not find character with photon ID: {senderID}");
+        }
         // Block push if protection mode is active
         if (protectionPush) {
             Plugin.Log.LogInfo("Push blocked by protection mode.");
@@ -334,28 +348,13 @@ public class PushManager : MonoBehaviour {
         }
 
         // Ensure local character is identified
+        // Ensure we have a reference to the local character
         if (localCharacter is null) {
-            foreach (Character character in Character.AllCharacters) {
-                if (character.IsLocal) {
-                    localCharacter = character;
-                    break;
-                }
-            }
+            localCharacter = Character.AllCharacters.First(c => c.IsLocal);
             if (localCharacter is null) {
-                Plugin.Log.LogError("Local Character is still null in RPC!");
+                Plugin.Log.LogError("Failed to find local character in PushPlayer_Rpc.");
                 return;
             }
-        }
-
-        // Trigger push animation on the sender (if visible on this client)
-        if (Character.GetCharacterWithPhotonID(senderID, out Character senderCharacter)) {
-            PushManager senderPushManager = senderCharacter.GetComponent<PushManager>();
-            if (senderPushManager is not null) {
-                senderPushManager.animationCoolDown = ANIMATION_TIME;
-            }
-        }
-        else {
-            Plugin.Log.LogWarning($"Could not find character with photon ID: {senderID}");
         }
 
         // Only apply force if this client controls the target character
