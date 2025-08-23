@@ -1,61 +1,64 @@
 # Changelog
 
 ## Version 0.6.0
-- Added Charge System
-  - Hold the push button to charge up for a stronger push!
-  - Longer charge = stronger push (up to a configurable maximum).
-  - Maximum charge power scales with hold time (configurable).
-  - Charge strength multiplies base push force, enabling powerful.
+### Charge System
+- Added **chargeable push** by holding down the push key.
+- Longer charge = stronger push (up to a configurable maximum multiplier: x1.5).
+- Visual charge indicator displayed as a progress bar at the bottom of the screen.
+- Charge builds while holding the push key and is applied upon release.
 
-- Added Push Protection Mode
-  - Protect yourself from unwanted physical interactions!
-  - Toggleable option to block incoming pushes from other players.
-  - When active, you become immune to player pushes.
-  - Toggled with a single key (configurable).
+### Self-Push
+- Added a dedicated key to **push yourself**.
+- Enables mobility control and environmental interactions.
 
-- Enhanced Visual Feedback
-  - Charge Indicator: Smooth bar at the bottom of the screen showing charge progress.
-    — Color is customizable to match your style.
-    — Only displayed while holding the push button.
-  - Protection UI Indicator: Shows whether push protection is active.
-    — Visual status in the top-right corner (yellow text: "Protection: ON/OFF").
+### Push Protection Mode
+- Toggleable protection against incoming pushes from other players.
+- Pressing the protection key toggles immunity on/off.
+- Status is visually indicated on-screen (top-right corner).
 
-- Refactored Configuration System
-  - Replaced Config.Bind with centralized `ConfigurationHandler`.
-  - Simplified future config expansion.
+### Enhanced Configuration System
+- Replaced `Config.Bind` with a centralized `ConfigurationHandler`.
+- All key parameters are now defined as constants for easy balancing:
+  - Push range (default: 2.5m)
+  - Cooldown (default: 1s)
+  - Stamina cost scaling (with charge)
+  - UI colors and visual settings
 
-- Performance Optimizations
-  - Cached components (`Character`, `Camera.main`) in `Awake()` — no more `GetComponent` calls per frame.
-  - Improved stability with null checks during initialization.
-  - Automatic component disabling on critical errors.
+### Improved UI & Visual Feedback
+- **Charge bar** appears during button hold — smooth progress visualization via `Texture2D`.
+- **Protection status indicator** shows "ON/OFF" in yellow text at top-right.
+- Both UI elements are clean, non-intrusive, and customizable.
 
-- Code & Balance Improvements
-  - All parameters (force, range, cooldown, stamina cost, etc.) moved to `const` values.
-  - Easy balance adjustments without code searching.
-  - Localization support: Item checks now use `ItemTags.BingBong` instead of string comparison.
-    — Works correctly across language changes.
+### Performance & Stability Optimizations
+- Cached critical components (`Character`, `Camera.main`) in `Awake()` — eliminates per-frame `GetComponent` calls.
+- Null checks during initialization prevent crashes.
+- Component automatically disables itself on critical errors.
+- Safe `GetCharacter()` recursion with proper null handling.
+- Fixed potential issues when `mainCamera` or `Character` is missing.
 
-- Improved Raycast Accuracy
-  - Now uses `LayerMask` to filter only the "Character" layer.
-  - Prevents false triggers and improves performance.
+### Refined Push Logic
+- Final push strength now scales with:
+  - Presence of the "BingBong" item (x10 multiplier)
+  - Charge level (up to x1.5)
+- Stamina cost dynamically scales with charge (up to x3 at full charge).
+- Raycast now uses a dedicated `LayerMask` filtering only the "Character" layer — improves accuracy and performance.
 
-- UI & Visual Enhancements
-  - Implemented OnGUI with improved rendering:
-    — Protection Indicator: Yellow text in the top-right corner.
-    — Charge Bar: Horizontal bar at the bottom of the screen.
-      • Rendered via `Texture2D` for smooth color transitions.
-      • Displays charge progress in percentage (0% → 100%).
+### RPC & Animation Improvements
+- Push animation now plays on the **sender** (not just the target).
+- Push sound effect plays locally for both the attacker and the target.
+- Better feedback and synchronization across network.
 
-- Bug Fixes & Security Improvements
-  - Fixed potential null reference leaks.
-    — Added null protection when retrieving `Character` via `GetCharacter()`.
-  - Added `protectionPush` check in `PushPlayer_Rpc` — pushes are now properly blocked.
-  - Improved RPC logging: now includes `SenderID` for better action tracking.
+### Partial Localization Support
+- "BingBong" item detection now uses `ItemTags.BingBong` instead of string comparison.
+- Ensures compatibility across language changes and prevents name-based bugs.
 
-- Configurable Controls (via ConfigurationHandler)
-  - PushKey: Key to initiate push (default: F)
-  - ProtectionKey: Key to toggle push protection (default: F10)
-  - All settings can be customized in the BepInEx/config configuration file.
+## ⚙️ Configurable Settings (via PEAK/BepInEx/config/com.github.goldenstein64.PushMod_MesaUpdate.cfg)
+The following options can be customized in the BepInEx configuration file:
+- `PushKey` — Key to perform a regular push (default: F)
+- `SelfPushKey` — Key to push yourself (default: G)
+- `ProtectionKey` — Key to toggle push protection (default: F10)
+- `CanCharge` — Enable or disable charge system (default: true)
+
 
 ## Version 0.5.3
 - Characters can push themselves if they don't find a character to push
